@@ -31,27 +31,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import logging
-import time
-import base64
 
 from google.appengine.api import urlfetch
 
-_MY_APP   = 'TheOpenCorps/1.0.0'
+_MY_APP = 'TheOpenCorps/1.0.0'
 
 class HTTPException(Exception):
+    """Base class for all HTTP related exceptions"""
     pass
 
-class cache(object):
+class cache(object):    # pylint: disable=invalid-name
     """
     Decorator to memoise return value (no kword args)
     """
-    def __init__(self, f):
-        self.f = f
+    def __init__(self, func):
+        self._func = func
         self.memo = {}
 
     def __call__(self, *args):
-        if not args in self.memo:
-            self.memo[args] = self.f(*args)
+        if args not in self.memo:
+            self.memo[args] = self._func(*args)
         return self.memo[args]
 
 def auth(method):
@@ -69,7 +68,7 @@ class ASyncResult(object):
     """
     Convenience mechanism for un-wrapping an RPC
     """
-    def __init__(self, rpc, log, valid_codes=[200]):
+    def __init__(self, rpc, log, valid_codes=(200,)):
         self.rpc = rpc
         self.log = log
         self.valid_codes = valid_codes
@@ -185,7 +184,8 @@ class APIEndpointBase(object):
             request_args['headers']["Accept"] = self._accept
         if self._token and "Authorization" not in request_args['headers']:
             request_args['headers']["Authorization"] = "token %s" % self._token
-        if request_args['payload'] is not None and "Content-Type" not in request_args['headers']:
+        if request_args['payload'] is not None and \
+                                "Content-Type" not in request_args['headers']:
             request_args['headers']["Content-Type"] = "application/json"
         return request_args
 
@@ -226,17 +226,21 @@ class APIEndpointBase(object):
         """
         request_args = self._create_request_args(**kwargs)
         rpc = urlfetch.create_rpc()
-        rpc._msg = "%s: %s%s" % (request_args["method"], self._endpoint, resource)
+        rpc._msg = "%s: %s%s" % (request_args["method"],
+                                 self._endpoint,
+                                 resource)
         urlfetch.make_fetch_call(rpc, self._endpoint + resource, **request_args)
         return ASyncResult(rpc, self.log)
 
 
-    def request_json(self, resource, valid_codes=[200], **kwargs):
+    def request_json(self, resource, valid_codes=(200,), **kwargs):
         """
         Returns a JSON-like object which is actually a future...
         """
         request_args = self._create_request_args(**kwargs)
         rpc = urlfetch.create_rpc()
-        rpc._msg = "%s: %s%s" % (request_args["method"], self._endpoint, resource)
-        urlfetch.make_fetch_call(rpc, self._endpoint + resource, **request_args)
+        rpc._msg = "%s: %s%s" % (request_args["method"],
+                                 self._endpoint,
+                                 resource)
+        urlfetch.make_fetch_call(rpc, self._endpoint+resource, **request_args)
         return ASyncJSONObject(rpc, self.log, valid_codes=valid_codes)

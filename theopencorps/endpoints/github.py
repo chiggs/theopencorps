@@ -26,7 +26,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import base64
 import json
 
-from theopencorps.endpoints import APIEndpointBase, HTTPException, auth, cache
+from theopencorps.endpoints import APIEndpointBase, HTTPException, cache
 
 
 class GithubEndpoint(APIEndpointBase):
@@ -37,7 +37,7 @@ class GithubEndpoint(APIEndpointBase):
     def __init__(self, token=None):
         APIEndpointBase.__init__(self)
         self._token = token
-        self.log.info("Created endpoint with token %s" % repr(token))
+        self.log.info("Created endpoint with token %s", repr(token))
 
     @property
     @cache
@@ -103,7 +103,7 @@ class GithubEndpoint(APIEndpointBase):
 
         return json.loads(result.content)
 
-    def create_webhook(self, user, repo, url, events=["push"], secret="bingo", insecure=True):
+    def create_webhook(self, user, repo, url, events=("push",), secret="bingo", insecure=True):
         """
         Create a webhook on a given repository
         """
@@ -221,7 +221,8 @@ class GithubEndpoint(APIEndpointBase):
                 sha = content["sha"]
                 self.log.info("Merge commit was %s", sha)
             except Exception as e:
-                self.log.error("Unable to extract sha from %s", repr(content))
+                self.log.error("Unable to extract sha from %s (%s)",
+                               repr(content), repr(e))
             return sha
 
         if result.status_code == 409:
