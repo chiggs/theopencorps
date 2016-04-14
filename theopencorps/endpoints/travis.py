@@ -40,19 +40,19 @@ class TravisEndpoint(APIEndpointBase):
 
     def __init__(self, token=None):
         APIEndpointBase.__init__(self)
-        self._token = "\"%s\"" % token
+        self.token = "\"%s\"" % token
 
     def login(self):
-        if self._token is not None:
-            self.log.info("Already logged into Travis with token %s", self._token)
+        if self.token is not None:
+            self.log.info("Already logged into Travis with token %s", self.token)
             return
 
         response = self.request("/auth/github",
                                 method="POST",
-                                payload=json.dumps({"github_token": self._gh_token}))
+                                payload=json.dumps({"github_token": self.token}))
         response = json.loads(response.content)
-        self._token = str(response['access_token'])
-        self.log.info("Logged in to Travis (token %s)", self._token)
+        self.token = str(response['access_token'])
+        self.log.info("Logged in to Travis (token %s)", self.token)
 
     def get_repo(self, user, repo):
         """

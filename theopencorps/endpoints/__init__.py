@@ -80,9 +80,9 @@ class ASyncResult(object):
             self.log.error("Failed to retrieve %s (%s)", self.rpc.msg, repr(e))
             return None
 
-        msg = "{s} {d} (returned {d} bytes)".format(self.rpc._msg,
-                                                    result.status_code,
-                                                    len(result.content))
+        msg = "{} {} (returned {} bytes)".format(self.rpc.msg,
+                                                 result.status_code,
+                                                 len(result.content))
         json_result = json.loads(result.content)
 
         if result.status_code in self.valid_codes:
@@ -150,7 +150,19 @@ class APIEndpointBase(object):
         self._token = None
         self.log = logging.getLogger(self.__class__.__name__)
 
+    @property
+    def token(self):
+        return self._token
 
+    @token.setter
+    def token(self, token):
+        if self._token != None:
+            self.log.error("Token has been set multiple times")
+            self.log.debug("Before: %s, after: %s",
+                           repr(self._token), repr(token))
+        self._token = token
+
+    # pylint: disable=too-many-arguments
     def _create_request_args(self, payload=None,
                                    method="GET",
                                    headers=None,
@@ -226,9 +238,9 @@ class APIEndpointBase(object):
         """
         request_args = self._create_request_args(**kwargs)
         rpc = urlfetch.create_rpc()
-        rpc._msg = "%s: %s%s" % (request_args["method"],
-                                 self._endpoint,
-                                 resource)
+        rpc.msg = "%s: %s%s" % (request_args["method"],
+                                self._endpoint,
+                                resource)
         urlfetch.make_fetch_call(rpc, self._endpoint + resource, **request_args)
         return ASyncResult(rpc, self.log)
 
@@ -239,8 +251,8 @@ class APIEndpointBase(object):
         """
         request_args = self._create_request_args(**kwargs)
         rpc = urlfetch.create_rpc()
-        rpc._msg = "%s: %s%s" % (request_args["method"],
-                                 self._endpoint,
-                                 resource)
+        rpc.msg = "%s: %s%s" % (request_args["method"],
+                                self._endpoint,
+                                resource)
         urlfetch.make_fetch_call(rpc, self._endpoint+resource, **request_args)
         return ASyncJSONObject(rpc, self.log, valid_codes=valid_codes)

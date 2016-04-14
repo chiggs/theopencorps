@@ -36,7 +36,7 @@ class GithubEndpoint(APIEndpointBase):
 
     def __init__(self, token=None):
         APIEndpointBase.__init__(self)
-        self._token = token
+        self.token = token
         self.log.info("Created endpoint with token %s", repr(token))
 
     @property
@@ -84,12 +84,14 @@ class GithubEndpoint(APIEndpointBase):
         If block, wait until the new repository is available and
         return the new repository information
         """
+        if not block:
+            raise NotImplemented("Haven't implemented non-blocking fork yet")
         if organisation:
             payload = json.dumps({"organization": organisation})
             fullname = "%s/%s" % (organisation, repo)
         else:
+            payload = None
             fullname = "%s/%s" % (self.user["login"], repo)
-            payload=None
         result = self.request("/repos/%s/%s/forks" % (user, repo),
                               method="POST",
                               payload=payload)
@@ -103,7 +105,9 @@ class GithubEndpoint(APIEndpointBase):
 
         return json.loads(result.content)
 
-    def create_webhook(self, user, repo, url, events=("push",), secret="bingo", insecure=True):
+    # pylint: disable=too-many-arguments
+    def create_webhook(self, user, repo, url,
+                       events=("push",), secret="bingo", insecure=True):
         """
         Create a webhook on a given repository
         """
@@ -143,7 +147,9 @@ class GithubEndpoint(APIEndpointBase):
         current = json.loads(response.content)
         return current["object"]["sha"]
 
-    def commit_file(self, user, repo, path, content, message, branch='master'):
+    # pylint: disable=too-many-arguments
+    def commit_file(self, user, repo, path, content, message,
+                    branch='master'):
         """
         Commit a file
             path        (str)   path to file
@@ -182,6 +188,7 @@ class GithubEndpoint(APIEndpointBase):
         return response.status_code == 200
 
 
+    # pylint: disable=too-many-arguments
     def cherry_pick(self, user, repo, sha1, branch="master", force=False):
         """
         Cherry pick an sha1 onto user/repo
