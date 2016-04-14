@@ -85,7 +85,7 @@ class GithubEndpoint(APIEndpointBase):
         return the new repository information
         """
         if not block:
-            raise NotImplemented("Haven't implemented non-blocking fork yet")
+            raise NotImplementedError("Haven't implemented non-blocking fork yet")
         if organisation:
             payload = json.dumps({"organization": organisation})
             fullname = "%s/%s" % (organisation, repo)

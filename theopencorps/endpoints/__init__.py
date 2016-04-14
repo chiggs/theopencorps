@@ -59,7 +59,7 @@ def auth(method):
     """
     def _wrapper(*args):
         self = args[0]
-        if self._token is None:
+        if self.token is None:
             self.login()
         return method(*args)
     return _wrapper
@@ -156,7 +156,7 @@ class APIEndpointBase(object):
 
     @token.setter
     def token(self, token):
-        if self._token != None:
+        if self._token is not None:
             self.log.error("Token has been set multiple times")
             self.log.debug("Before: %s, after: %s",
                            repr(self._token), repr(token))
