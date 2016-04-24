@@ -1,3 +1,6 @@
+"""
+Helper for generating the .travis.yml file for 
+"""
 __copyright__ = """
 Copyright (C) 2016 Potential Ventures Ltd
 
@@ -20,23 +23,20 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import theopencorps.paths
+import os
+from jinja2 import Environment, FileSystemLoader
 
-import logging
-import jinja2
-import webapp2
-from google.appengine.ext import ndb
+# Annoyingly GAE is jinja 2.6 which doesn't support lstrip_blocks=True
+_env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)), trim_blocks=True)
 
-import theopencorps.auth
-import theopencorps.secrets
-from theopencorps.datamodel.models import Project
-import theopencorps.routes as routes
+class TravisYML(object):
+    """
+    Convenience wrapper for our Travis YML generation
+    """
+    def __init__(self, *args, **kwargs):
+        for name, value in kwargs.iteritems():
+            setattr(self, name, value)
 
-
-
-app_pre = webapp2.WSGIApplication(routes.ROUTES, debug=True, config=theopencorps.secrets.config)
-app_pre.error_handlers[404] = routes.handle_404
-
-# Ensure that all pending async calls complete before terminating the request
-app = ndb.toplevel(app_pre)
-
+    def render(self):
+        _template = _env.get_template('travis.yml.tpl')
+        return _template.render(**self.__dict__)

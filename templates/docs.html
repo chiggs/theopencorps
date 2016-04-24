@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+            <li><a href="#">YML</a></li>
+          </ul>
+        </div>
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <div class="col-sm-9 col-md-6">
+          <h1 class="page-header">Documentation</h1>
+          <h2 class="sub-header">Overview</h2>
+            <p>
+            The Open Corps is an online platform providing a cloud-based toolflow for
+            FPGA and ASIC projects.
+            </p>
+
+            <p>
+            We leverage a selection of services that have revolutionised software
+            development and apply them to hardware development.  Combined with the
+            best commercial tools around we have created a powerfull online flow.
+            </p>
+
+            <p>
+            You can:
+            <ul>
+            <li>Run simulation regressions automatically</li>
+            <li>Build documentation automatically</li>
+            <li>Build supporting software libraries</li>
+            <li>Run synthesis automatically</li>
+            <li>Easily leverage other Open Source projects as dependencies</li>
+            </ul>
+            </p>
+            </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+

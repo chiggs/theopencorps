@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if not user %}
+    <!-- Main jumbotron banner -->
+    <section id="jumbotron-banner">
+      <div class="jumbotron">
+      <div class="container">
+          <div class="col-md-4">
+              <img class="img-responsive" src="{{baseurl}}static/img/booby_trap.jpg">
+          </div>
+          <div class="col-md-8">
+              <h2>Something went very wrong</h2>
+              <p>{{ message }}</p>
+          </div>
+      </div>
+      </div>
+    </section>
+{% endif %}
+
+{% endblock %}

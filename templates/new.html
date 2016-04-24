@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <!-- Project views -->
+  <section id="latest-projects" class="wio-section">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-xs-8 col-xs-offset-2">
+          <h3>New Project</h3>
+        </div>
+      </div>
+      <div class="row">
+        <form class="form-horizontal" action="/new" role="form" id="new-project-form"><!-- method="post">-->
+            <fieldset>
+                <input type=hidden name="unique_id" value="{{unique_id}}">
+                <input type=hidden name="gh_username" value="{{gh_user["login"]}}">
+                <div class="form-group">
+                    <label for="repoSel"     class="control-label col-xs-2 col-xs-offset-4">Repository</label>
+                    <label for="projectName" class="control-label col-xs-2">Project Name</label>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-2 col-xs-offset-4">
+                        <select class="form-control" name="repo">
+                            {% if repos %}
+                                {% for repo in repos %}
+                                    <option value="{&quot;name&quot;:&quot;{{repo["name"]}}&quot;, &quot;id&quot;:{{repo["id"]}}}">{{ repo["name"] }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="col-xs-2">
+                        <input type="string" class="form-control" id="projectName" name="name" placeholder="Awesome Project">
+                    </div>
+                </div>
+
+                <!-- Textarea -->
+                <div class="form-group">
+                    <label class="col-xs-4 control-label" for="projectDesc">Description</label>
+                    <div class="col-xs-4">
+                        <textarea class="form-control" id="projectDesc" name="description" placeholder="..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Tags -->
+                <div class="form-group">
+                    <label class="col-xs-4 control-label" for="projectTags">Tags</label>
+                    <div class="col-xs-4">
+                        <input type="text" class="form-control" id="projectTags" name="tags" data-role="tagsinput" value="FPGA">
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="col-xs-4">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-4 col-xs-offset-4">
+                        <div class="progress progress-striped active hide">
+                            <div class="progress-bar progress-bar-info" id='realtime-progress-bar' role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <ul id="progress_log"></ul>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+  </section>
+
+{% endblock %}
+
+{% block tail_javascript %}
+
+        <script>
+            $(document).ready(function(){
+
+                console.log( "ready!" );
+                var uID = {{ unique_id }}
+
+                // Instantiate Pusher
+                var pusher = new Pusher('66ed0131e87461758b37') // Change it to your Pusher APP Key
+                var channel = pusher.subscribe('progress_'+uID) // The Channel you want to subscribe to
+
+//                 // Enable pusher logging - don't include this in production
+//                 Pusher.log = function(message) {
+//                     if (window.console && window.console.log) {
+//                         window.console.log(message);
+//                     }
+//                 };
+
+                channel.bind('update', function(data) {         // Bind to an event on our channel, in our case, update
+                    var messageLog = $('#progress_log')
+                    var progressBar = $('#realtime-progress-bar')
+
+                    progressBar.width(data.progress+"%")
+
+                    // Process is complete,Do whatever you want now, maybe redirect them to their freshly created account?
+                    if (data.progress == 100) {
+                        window.location.replace(data.message);
+                    } else {
+                        messageLog.prepend("<li>" + data.message + "</li>")
+//                         window.console.log(data.message);
+                    }
+                });
+
+                // Submit the forms using AJAX, nothing to see here.
+                $('#new-project-form').submit(function (e) {
+                    e.preventDefault();
+                    var name = $('#name').val() || "Bob"
+                    var form = this
+                    var btn = $(form).find('button')
+                    var progressBar = $(form).find('.progress')
+                    progressBar.removeClass('hide')
+                    btn.prop('disabled', true)
+
+                    $.post($(form).attr('action'), $(form).serialize(), function () {}).done(function(response) {
+                        btn.prop('disabled', false)
+//                         btn.value = "<span class=\"glyphicon glyphicon-refresh glyphicon-refresh-animate\"></span>BING";
+                        progressBar.toggleClass('active')
+                        if (!$(form).attr('id')) {
+                            $(form).children('.messages').html(response)
+                        }
+                    })
+                })
+            })
+        </script>
+
+{% endblock %}

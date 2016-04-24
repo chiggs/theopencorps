@@ -1,0 +1,122 @@
+{% set baseurl = '../../../' %}
+{% extends "base.html" %}
+
+{% block content %}
+
+    <!-- Project views -->
+<section id="current-projects" class="wio-section">
+<div class="container-fluid">
+    <div class="row" id="project_name">
+        <div class="col-xs-8 col-xs-offset-2">
+            <h2>{{project.name|e}}</h2>
+            <a href="{{repo.url}}">{{repo.full_name}}</a>
+            <br>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-4 col-xs-offset-2">
+            <span class="glyphicon glyphicon-tag"></span>
+            {% for tag in project.tags %}
+                <span class="label label-primary">{{tag|e}}</span>
+            {% endfor %}
+        </div>
+        <div class="col-xs-4">
+            {% for shield in project.shields %}
+                {% if project.shields_svg[loop.index0] %}
+                    {{project.shields_svg[loop.index0]}}
+                {% else %}
+                    <a href="#simulation">
+                        <img src="https://img.shields.io/badge/{{shield.subject}}-{{shield.status}}-{{shield.colour}}.svg">
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+      </div>
+
+    <div class="row" id="title_section">
+        <div class="col-xs-8 col-xs-offset-2">
+{% if push.compare %}
+            <h4 id="build_info">Build details for <a href="{{push.compare}}">{{push.key.id()[0:6]}}</a>:</h4>
+{% else %}
+            <h4 id="build_info">Build details for <a href="https://github.com/{{repo.full_name}}/commit/{{push.key.id()}}">{{push.key.id()[0:6]}}</a>:</h4>
+{% endif %}
+        </div>
+    </div>
+
+    <div class="row" id="simulation_section">
+        <div class="col-xs-8 col-xs-offset-2">
+            <h2 id="simulation">Simulation</h2>
+        </div>
+    </div>
+
+    <div class="row" id="simulation_results">
+      <div class="col-xs-8 col-xs-offset-2">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Suite</th>
+              <th>Name</th>
+              <th>Result</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+{% for testcase in junit.testcases %}
+            <tr>
+              <td>{{testcase.classname}}</td>
+              <td>{{testcase.name}}</td>
+{% if testcase.skipped %}
+              <td>SKIPPED</td>
+{% elif testcase.error %}
+              <td>ERROR</td>
+{% elif testcase.failure %}
+              <td>FAILED</td>
+{% elif testcase.passed %}
+              <td>PASSED</td>
+{% else %}
+              <td>FAILED</td>
+{% endif %}
+              <td>{{testcase.time}}</td>
+            </tr>
+{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+{% for name, content in sim_logfiles %}
+    <div class="row" id="simulation_logs_{{name}}">
+      <div class="col-xs-8 col-xs-offset-2">
+        <pre class="pre-scrollable terminal" id="simulation_logs_{{name}}_content">
+{{content|safe}}
+        </pre>
+      </div>
+    </div>
+{% endfor %}
+    <div class="row" id="synthesis_section">
+        <div class="col-xs-8 col-xs-offset-2">
+            <h2 id="synthesis">Synthesis</h2>
+        </div>
+    </div>
+
+      <div class="row" id="synthesis_results">
+        <div class="col-xs-8 col-xs-offset-2">
+            <h3>synthesis results would go here</h3>
+        </div>
+      </div>
+
+    </div>
+  </section>
+{% endblock %}
+
+{% block tail_javascript %}
+    <script>
+        $(document).ready(function() {
+
+            {% for name, content in sim_logfiles %}
+                var {{name}} = $('#simulation_logs_{{name}}_content');
+                {{name}}.scrollTop ({{name}}[0].scrollHeight - {{name}}.height ());
+            {% endfor %}
+        })
+    </script>
+{% endblock %}

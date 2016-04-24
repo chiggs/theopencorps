@@ -1,0 +1,84 @@
+
+var {{graph.name}}_data = = google.visualization.arrayToDataTable([
+    ['Commit', {%for heading in headings %}'{{heading}}',{% endfof %}, 'CommitFull'],
+{% if not graph.data|length %}
+    ['No Builds', {%for heading in headings %}0,{% endfof %}, 0],
+{% endif %}
+{% for d
+
+
+
+{% if not project.init_complete %}
+<h4><span class="glyphicon glyphicon-refresh spinning"></span>Project creation in progress, please wait...</h4><br>
+{% endif %}
+<ul class="list-unstyled">
+    <li>
+        <span class="glyphicon glyphicon-check"></span>
+        Project entry added to database
+    </li>
+    <li>
+        {% if project.github_webhook %}
+            <span class="glyphicon glyphicon-check"></span>
+            Added Github webhook to notify us of project changes
+        {% else %}
+            <span class="glyphicon glyphicon-cog spinning"></span>
+            Add Github webhook to notify us of project changes
+        {% endif %}
+    </li>
+    <li>
+        {% if project.forked %}
+            <span class="glyphicon glyphicon-check"></span>
+            Mirrored <a href="{{repo.url}}">{{repo.full_name}}</a> to <a href="https://github.com/OpenCorps/{{repo.name}}">OpenCorps/{{repo.name}}</a>
+        {% else %}
+            <span class="glyphicon glyphicon-cog spinning"></span>
+            Create a mirror of <a href="{{repo.url}}">{{repo.full_name}}</a> to <a href="https://github.com/OpenCorps/{{repo.name}}">OpenCorps/{{repo.name}}</a>
+        {% endif %}
+    </li>
+    <li>
+        {% if project.checked_user_oc_yml %}
+            {% if project.user_oc_yml %}
+                <span class="glyphicon glyphicon-check"></span>
+                Reporitory contains <a href="{{baseurl}}/doc/theopencorps.yml">.theopencorps.yml</a>
+            {% else %}
+                <span class="glyphicon glyphicon-remove"></span>
+                Please commit <a href="{{baseurl}}/doc/theopencorps.yml">.theopencorps.yml</a> to <a href="{{repo.url}}">{{repo.full_name}}</a>
+            {% endif %}
+        {% else %}
+            <span class="glyphicon glyphicon-cog spinning"></span>
+            Checking for <a href="{{baseurl}}/doc/theopencorps.yml">.theopencorps.yml</a>
+        {% endif %}
+    </li>
+    <li>
+        {% if project.fork_yml_valid %}
+            <span class="glyphicon glyphicon-check"></span>
+            <a href="https://github.com/OpenCorps/{{repo.name}}">OpenCorps/{{repo.name}} contains a valid <a href="{{baseurl}}/doc/opencorps.yml">.opencorps.yml</a>
+        {% elif project.fork_yml_invalid %}
+            <span class="glyphicon glyphicon-remove"></span>
+            <a href="{{baseurl}}/doc/theopencorps.yml">.theopencorps.yml</a> is invalid: {{project.system_message}}
+        {% else %}
+            <span class="glyphicon glyphicon-cog spinning"></span>
+            Validate <a href="{{baseurl}}/doc/theopencorps.yml">.theopencorps.yml</a> in <a href="https://github.com/OpenCorps/{{repo.name}}">OpenCorps/{{repo.name}}</a>
+        {% endif %}
+    </li>
+    <li>
+        {% if project.travis_webhook %}
+            <span class="glyphicon glyphicon-check"></span>
+            Travis webhooks for <a href="https://github.com/OpenCorps/{{repo.name}}">OpenCorps/{{repo.name}}</a> enabled
+        {% elif project.travis_sync_req %}
+            <span class="glyphicon glyphicon-cog spinning"></span>
+            Waiting for Travis to synchronise
+        {% else %}
+            <span class="glyphicon glyphicon-cog spinning"></span>
+            Enable Travis webhooks on <a href="https://github.com/OpenCorps/{{repo.name}}">OpenCorps/{{repo.name}}</a>
+        {% endif %}
+    </li>
+    <li>
+        {% if project.fork_travis_yml %}
+            <span class="glyphicon glyphicon-check"></span>
+            Committed generated .travis.yml to <a href="https://github.com/OpenCorps/{{repo.name}}">OpenCorps/{{repo.name}}</a>
+        {% else %}
+            <span class="glyphicon glyphicon-cog spinning"></span>
+            Commit generated .travis.yml to <a href="https://github.com/OpenCorps/{{repo.name}}">OpenCorps/{{repo.name}}</a>
+        {% endif %}
+    </li>
+</ul>

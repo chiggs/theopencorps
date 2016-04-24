@@ -1,0 +1,56 @@
+<html>
+<head>
+</head>
+<body>
+
+<div id="logfile">
+</div>
+
+<script src="./../gae/static/js/vendor/jquery-1.11.2.min.js"></script>
+<script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+<script src="ansi_up.js" type="text/javascript"></script>
+
+// Very simplistic travis log handler
+<script>
+
+    var logHandler = function(data, textStatus, jqXHR) {
+
+        var sections = data.split("travis_fold:start:");
+
+        for (var i=0; i < sections.length; i++) {
+
+            if (!sections[i].length) {
+                continue;
+            }
+
+            var content = sections[i].split('\r');
+            var title = content[0];
+
+            var $newdiv = $('<div/>', {
+                id: 'logdata_' + title,
+                });
+            $newdiv.append($('<h4/>').html("<span class=\"glyphicon glyphicon-menu-right\"></span>" + title));
+
+            // TODO use <pre> for code
+            var $messages = $('<div/>');
+            for (var line=1; line<content.length; line++) {
+                $messages.append("<p>" +  ansi_up.ansi_to_html(content[line]) + "</p>");
+            }
+
+            $newdiv.append($messages);
+            $("#logfile").append($newdiv);
+
+            $newdiv.accordion({
+                collapsible: true,
+                active: false
+            });
+        }
+    };
+
+    $(document).ready(function(){
+        $.get("https://api.travis-ci.org/logs/72553043", logHandler);
+
+    });
+</script>
+</body>
+</html>

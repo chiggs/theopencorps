@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if not user %}
+    <!-- Main jumbotron banner -->
+    <section id="jumbotron-banner">
+      <div class="jumbotron">
+      <div class="container">
+          <div class="col-md-5">
+              <img class="img-responsive" src="static/img/welcome_scaled.png">
+          </div>
+          <div class="col-md-6 col-md-offset-1">
+              <h2>RTL design for the 21st century.</h2>
+              <p>We're a friendly collection of developers helping to improve FPGA design.</p>
+              <ul class="fa-ul">
+                <li><i class="fa-li fa fa-check-square"></i><h4>Automated regressions using <strong>Travis-ci</strong></h4></li>
+                <li><i class="fa-li fa fa-check-square"></i><h4>Host your code on <strong>GitHub</strong></h4></li>
+                <li><i class="fa-li fa fa-check-square"></i><h4>Synthesise using <strong>Quartus</strong> and <strong>Vivado</strong></h4></li>
+                <li><i class="fa-li fa fa-check-square"></i><h4>Simulate with <strong>Riviera-PRO</strong></h4></li>
+              </ul>
+              <p><a class="btn btn-primary btn-lg" href="/login" role="button">Sign up for free!</a></p>
+          </div>
+      </div>
+      </div>
+    </section>
+{% endif %}
+
+    <!-- Project views -->
+  <section id="latest-projects" class="wio-section">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-xs-8 col-xs-offset-1">
+          <h2>Latest Projects</h2>
+        </div>
+<!--        <div class="col-xs-3">
+          <h2>Latest Activity</h2>
+        </div>-->
+      </div>
+      <div class="row">
+        <div class="col-xs-8 col-xs-offset-2">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th width="1%"></th>
+              <th width="20%">Project</th>
+              <th width="40%">Description</th>
+              <th width="8%">Docs</th>
+              <th width="8%">Simumlation</th>
+              <th width="8%" colspan="2">Synthesis</th>
+              <th width="8%"></th>
+            </tr>
+          </thead>
+          <tbody>
+{% for project in projects %}
+{% set repo = project.repo.get() %}
+            <tr>
+              <td><i class="fa fa-star-o"></i></td>
+              <td>
+                <a href="{{repo.full_name}}"><strong>{{project.name|e}}</strong></a><br>
+                <p class="h5 small"><a href="{{repo.url}}"><i class="fa fa-github fa-lg"></i> {{repo.full_name}}</a></p>
+              </td>
+              <td>{{project.description|e}}</td>
+{% for shield in project.shields %}
+              <td>
+                <a href="{{repo.full_name}}#{{shield.href}}"><img src="https://img.shields.io/badge/{{shield.subject}}-{{shield.status}}-{{shield.colour}}.svg"></a>
+              </td>
+{% endfor %}
+            </tr>
+{% endfor %}
+          </tbody>
+        </table>
+        </div>
+<!--    
+        <div class="col-xs-3">
+            <ul id="activity_stream_example" class="activity-stream"></ul>
+        </div>
+-->
+      </div>
+      <div class="row">
+        <div class="col-xs-9">
+          <ul class="pager">
+            <li class="next"><a href="/projects/">See More →</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
