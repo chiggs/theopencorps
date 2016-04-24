@@ -23,18 +23,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import hmac
-import hashlib
 import logging
 from xml.etree import ElementTree
 
-from google.appengine.ext import ndb
-
 import theopencorps.auth
 
-from theopencorps.datamodel.models import Push, Project, JUnitTestResult, JUnitTestCase, TravisBuild, TravisJob
+from theopencorps.datamodel.models import Push, Project, JUnitTestResult, JUnitTestCase, TravisJob
 from theopencorps.handlers.hooks import CustomTravisHookHandler
-#from theopencorps.handlers.projects import ProjectHelper
+from theopencorps.datamodel.project import ProjectHelper
 
 
 def parse_testcase(tree):
@@ -96,7 +92,7 @@ class JunitResultsHandler(CustomTravisHookHandler):
 
         try:
             root = ElementTree.fromstring(self.request.body)
-        except:
+        except Exception:
             logging.warning("Invalid XML supplied")
             self.response.set_status(404)
             return
@@ -123,7 +119,7 @@ class JunitResultsHandler(CustomTravisHookHandler):
         build.insert_or_update()
         #build.purge_async()
 
-        logging.info("Put %s" % repr(testsuite))
+        logging.info("Put %s", repr(testsuite))
 
         helper = ProjectHelper(project)
         helper.update_sim_result(passed=testsuite.passed,

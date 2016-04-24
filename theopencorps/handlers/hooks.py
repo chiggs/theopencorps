@@ -29,10 +29,13 @@ from google.appengine.api import taskqueue
 import theopencorps.auth
 import theopencorps.secrets as config
 
-from theopencorps.datamodel.models import Push, Repository, TravisJob, TravisBuild
-from theopencorps.datamodel.project import ProjectHelper
+from theopencorps.datamodel.models import Push, TravisJob, TravisBuild
 
 from theopencorps.endpoints.travis import TravisEndpoint
+
+
+class HookException(Exception):
+    pass
 
 class GithubWebHookHandler(theopencorps.auth.TokenValidatedHandler):
 
@@ -48,7 +51,7 @@ class GithubWebHookHandler(theopencorps.auth.TokenValidatedHandler):
 
         try:
             request = json.loads(self.request.body)
-        except:
+        except Exception:
             logging.error("Invalid JSON supplied to GithubWebHookHandler")
             self.response.set_status(404)
             return
@@ -69,21 +72,21 @@ class GithubWebHookHandler(theopencorps.auth.TokenValidatedHandler):
 
         logging.info("Processing event \"%s\" for %s", event, project.full_name)
 
-        sha1 = request['after']
+        repo = project.repo.get()
+        if repo is None:
+            logging.error("Failed to find repository %s", project.repo.id)
+            self.response.set_status(202)
+            return
 
         # Ensure we don't already have an object tracking this event
+        sha1 = request['after']
         push = ndb.Key(Push, sha1).get()
+
         if push is not None:
             logging.warning("Already seem to have a Build event tracking %s", sha1)
             logging.debug(repr(request))
             logging.debug(repr(push.to_dict()))
             taskqueue.add(url="/%s" % repo.full_name)
-            return
-
-        repo = project.repo.get()
-        if repo is None:
-            logging.error("Failed to find repository %s", project.repo.id)
-            self.response.set_status(202)
             return
 
         got = request['repository']['full_name']
@@ -225,7 +228,7 @@ class JobPurgeHandler(theopencorps.auth.BaseSessionHandler):
         """
         try:
             job_id = int(job_id)
-        except:
+        except Exception:
             logging.warning("Job purge handler called with %s", repr(job_id))
             return
         TravisJob.purge_duplicate_travis_jobs(job_id)

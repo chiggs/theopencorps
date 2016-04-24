@@ -22,17 +22,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import theopencorps.paths
 
-import logging
-import jinja2
 import webapp2
 from google.appengine.ext import ndb
 
-import theopencorps.auth
 import theopencorps.secrets
-from theopencorps.datamodel.models import Project
 import theopencorps.routes as routes
-
-
 
 app_pre = webapp2.WSGIApplication(routes.ROUTES, debug=True, config=theopencorps.secrets.config)
 app_pre.error_handlers[404] = routes.handle_404

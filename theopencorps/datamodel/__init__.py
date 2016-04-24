@@ -47,13 +47,13 @@ class OCBaseModel(ndb.Model):
     created             = ndb.DateTimeProperty(auto_now_add=True)
 
     def put(self):
-        logging.debug("Storing %s = %s" % (self.__class__.__name__,
-                                           repr(self.to_dict())))
+        logging.debug("Storing %s = %s", self.__class__.__name__,
+                                         repr(self.to_dict()))
         return ndb.Model.put(self)
 
     def put_async(self):
-        logging.debug("Storing %s = %s" % (self.__class__.__name__,
-                                           repr(self.to_dict())))
+        logging.debug("Storing %s = %s", self.__class__.__name__,
+                                         repr(self.to_dict()))
         return ndb.Model.put_async(self)
 
 

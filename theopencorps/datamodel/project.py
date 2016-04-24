@@ -22,37 +22,21 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
-
-import base64
-import hashlib
-import cgi
 import json
 import logging
 import time
-import random
 import StringIO
 
-try:
-    import json
-except ImportError:
-    import simplejson as json
-
-
-from google.appengine.ext import ndb
-from google.appengine.api import taskqueue
 import webapp2
 
-import theopencorps.paths
-
+import theopencorps.paths as paths
 import pusher
-
-
 
 import theopencorps.auth
 import theopencorps.travis.yml
 import theopencorps.corefile
 import theopencorps.secrets as config
-from theopencorps.datamodel.models import Project, Repository, User, Shield, JUnitTestResult, Push
+from theopencorps.datamodel.models import Project, Repository, User, JUnitTestResult, Push
 
 from theopencorps.endpoints import HTTPException
 from theopencorps.endpoints.travis import TravisEndpoint
@@ -247,11 +231,12 @@ class ProjectHelper(object):
         try:
             fork = self.gh_oc.fork(user, name, organisation=self._org)
         except HTTPException as e:
-            self.log.error("%s failed: %s" % (msg, repr(e)))
+            self.log.error("%s failed: %s", (msg, repr(e)))
             self.project.system_message = "Failed to create %s: %s" % (msg, repr(e))
             return False
 
         self.log.info("Success: %s", msg)
+        self.log.debug("Fork returned %s", repr(fork))
         self.project.forked = True
         self.project.system_message = "Sucessfully forked %s/%s into %s/%s" % (user, name, self._org, name)
 
@@ -357,7 +342,7 @@ class ProjectHelper(object):
             if hook_d['name'] == self.repo.name and \
                                 hook_d['owner_name'] == self._org:
                 hook_id = hook_d['id']
-                logging.info("Found travis hook ID %s" % repr(hook_id))
+                logging.info("Found travis hook ID %s", repr(hook_id))
                 break
         else:
             self.log.error("Couldn't find a matching travis hook")

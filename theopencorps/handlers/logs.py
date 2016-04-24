@@ -70,14 +70,15 @@ class QuartusResultHandler(CustomTravisHookHandler):
         if self.push is not None:
             synth.push = self.push.key
 
-        results = logparser.handle_text(self.request.body, hint=fhint)
-        for result in results:
-            for metric, value in result.iteritems():
-                attribute = "%s_%s" % (result.name, metric)
-                attribute = attribute.lower()
-                attribute = attribute.replate("-", "_")
-                attribute = attribute.replate(".", "_")
-                setattr(synth, attribute, value)
+        # TODO: parse out metrics from logfiles
+        #results = logparser.handle_text(self.request.body, hint=fhint)
+        #for result in results:
+            #for metric, value in result.iteritems():
+                #attribute = "%s_%s" % (result.name, metric)
+                #attribute = attribute.lower()
+                #attribute = attribute.replate("-", "_")
+                #attribute = attribute.replate(".", "_")
+                #setattr(synth, attribute, value)
 
         build.insert_or_update()
         synth.put_async()

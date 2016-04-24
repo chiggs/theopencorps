@@ -32,13 +32,9 @@ import webapp2
 
 import theopencorps
 import theopencorps.handlers
-import theopencorps.paths
+from theopencorps.paths import JINJA_ENVIRONMENT
 from theopencorps.datamodel.models import Project
 
-JINJA_ENVIRONMENT = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(theopencorps.paths.templates),
-    extensions=['jinja2.ext.autoescape'],
-    autoescape=True)
 
 
 class MainPage(theopencorps.auth.BaseSessionHandler):

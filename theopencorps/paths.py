@@ -30,6 +30,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../lib'))
 
 templates = os.path.join(os.path.dirname(__file__), '../templates')
 
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(templates),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
+
 
 # Workaround the dev-environment SSL
 #   http://stackoverflow.com/q/16192916/893652

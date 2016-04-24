@@ -32,7 +32,6 @@ import hashlib
 
 
 import webapp2
-from google.appengine.ext import ndb
 
 from webapp2_extras import sessions
 
@@ -83,7 +82,7 @@ class LoginHandler(webapp2.RequestHandler):
                 user.put_async()
 
             else:
-                logging.info("Found user %s (%s) in datastore", user.key.id(), user.login, user.user_name)
+                logging.info("Found user %d: %s (%s) in datastore", user.key.id(), user.login, user.user_name)
 
             # Save the user name and ID to cookies that we can use it in other handlers.
             self.response.set_cookie('user_id', result.user.id)
@@ -208,7 +207,6 @@ class BaseSessionHandler(webapp2.RequestHandler):
 
         # Retrieve values from cookies.
         user_id = self.request.cookies.get('user_id')
-        user_name = urllib.unquote(self.request.cookies.get('user_name', ''))
 
         if user_id:
             user = User.get_by_id(str(user_id))

@@ -23,19 +23,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 import logging
-#import ansiconv
-
-try:
-    import json
-except ImportError:
-    import simplejson as json
+import ansiconv
 
 import cloudstorage as gcs
 
-import theopencorps.paths
+import theopencorps.paths as paths
 import theopencorps.auth
 
-from theopencorps.datamodel.models import Project, Repository, TravisBuild, TravisJob, Push, JUnitTestResult
+from theopencorps.datamodel.models import Project, Repository, TravisJob, Push, JUnitTestResult
 
 
 class BuildHandler(theopencorps.auth.BaseSessionHandler):

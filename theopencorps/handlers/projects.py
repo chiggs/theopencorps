@@ -22,10 +22,25 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
+import cgi
+import hashlib
+import json
+import logging
+import random
+import time
+
 import webapp2
+import pusher
+
+from google.appengine.ext import ndb
+from google.appengine.api import taskqueue
 
 import theopencorps
 import theopencorps.auth
+import theopencorps.paths as paths
+from theopencorps.endpoints import HTTPException
+from theopencorps.datamodel.project import ProjectHelper
+from theopencorps.datamodel.models import Project, JUnitTestResult, Shield, Repository
 
 class ProjectBaseHandler(theopencorps.auth.BaseSessionHandler):
 
@@ -135,7 +150,7 @@ class NewProjectHandler(ProjectBaseHandler):
             update_progress(0, "ERROR: Failed to retrieve Github repository information for id %s" % repo_info['id'])
             return
 
-        # Github repository is asynchronous, make take time to appear if newly created...
+        # Github repository is asynchronous, may take time to appear if newly created...
         retry = 1
         while "full_name" not in gh_repo:
             logging.warning("Attempt %d to retrieve repository information returned %s", retry, repr(gh_repo))
